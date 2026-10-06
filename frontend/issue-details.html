@@ -1,0 +1,1438 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow - Issue Details</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 p-8">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+
+            <div>
+                <a href="issues.html"
+                   class="text-indigo-600 hover:underline text-sm">
+                    ← Back to Issues
+                </a>
+
+                <h1 class="text-3xl font-bold text-slate-900 mt-2">
+                    Issue Details
+                </h1>
+            </div>
+
+            <a href="http://127.0.0.1:8000/docs"
+               target="_blank"
+               class="bg-slate-900 text-white px-4 py-2 rounded-lg">
+                API Docs
+            </a>
+
+        </div>
+
+        <!-- Loading -->
+        <div id="loading"
+             class="bg-white rounded-2xl p-8 shadow-sm text-center">
+            Loading issue...
+        </div>
+
+        <!-- Issue Content -->
+        <div id="issueContent" class="hidden">
+
+            <!-- Main Issue Card -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <div class="flex justify-between items-start gap-5">
+
+                    <div>
+                        <p id="issueKey"
+                           class="text-indigo-600 font-bold text-sm">
+                        </p>
+
+                        <h2 id="issueTitle"
+                            class="text-2xl font-bold text-slate-900 mt-2">
+                        </h2>
+                    </div>
+
+                    <span id="statusBadge"
+                          class="px-4 py-2 rounded-full text-sm font-semibold">
+                    </span>
+
+                </div>
+
+                <!-- Details -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mt-8">
+
+                    <div>
+                        <p class="text-xs text-slate-500">Severity</p>
+                        <p id="severity"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-500">Priority</p>
+                        <p id="priority"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-500">Reporter ID</p>
+                        <p id="reporter"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-500">Assignee ID</p>
+                        <p id="assignee"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Description -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h3 class="text-lg font-bold mb-3">
+                    📝 Description
+                </h3>
+
+                <p id="description"
+                   class="text-slate-600 whitespace-pre-line">
+                </p>
+
+            </div>
+
+            <!-- Reproduction Steps -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h3 class="text-lg font-bold mb-3">
+                    🔧 Reproduction Steps
+                </h3>
+
+                <p id="reproduction"
+                   class="text-slate-600 whitespace-pre-line">
+                </p>
+
+            </div>
+
+            <!-- Sprint -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h3 class="text-lg font-bold mb-4">
+                    🚀 Sprint Information
+                </h3>
+
+                <div class="grid grid-cols-2 gap-5">
+
+                    <div>
+                        <p class="text-xs text-slate-500">
+                            Project ID
+                        </p>
+
+                        <p id="projectId"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-500">
+                            Sprint ID
+                        </p>
+
+                        <p id="sprintId"
+                           class="font-semibold mt-1"></p>
+                    </div>
+
+                </div>
+
+            </div>
+<!-- Tags -->
+<div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+    <div class="flex items-center justify-between mb-4">
+
+        <div>
+            <h3 class="text-lg font-bold">
+                🏷️ Tags / Labels
+            </h3>
+
+            <p class="text-sm text-slate-500 mt-1">
+                Add labels to organize and classify this issue.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Add Tag -->
+    <div class="flex gap-3 mb-4">
+
+        <input
+            type="text"
+            id="tagName"
+            placeholder="Enter tag name, e.g. backend"
+            class="border rounded-lg px-4 py-2 flex-1"
+        >
+
+        <button
+            onclick="addTag()"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-semibold">
+            Add Tag
+        </button>
+
+    </div>
+
+    <p id="tagMessage" class="text-sm mb-3"></p>
+
+    <!-- Tags List -->
+    <div id="tagsList" class="flex flex-wrap gap-2">
+
+        <p class="text-sm text-slate-500">
+            Loading tags...
+        </p>
+
+    </div>
+
+</div>
+
+            <!-- =========================================
+                 DEVELOPER MATCHING
+            ========================================== -->
+
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <div class="flex items-center justify-between mb-4">
+
+                    <div>
+                        <h3 class="text-lg font-bold">
+                            👨‍💻 Developer Matching
+                        </h3>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Recommended developers based on issue skills and workload.
+                        </p>
+                    </div>
+
+                    <button
+                        onclick="loadDeveloperMatches()"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold">
+                        Find Developers
+                    </button>
+
+                </div>
+
+                <!-- Loading -->
+                <div id="developerLoading"
+                     class="hidden text-sm text-slate-500 py-4">
+                    Finding suitable developers...
+                </div>
+
+                <!-- Developer Matches -->
+                <div id="developerMatches"
+                     class="space-y-4">
+
+                    <p class="text-sm text-slate-500">
+                        Click "Find Developers" to see recommended developers.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Status Update -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h3 class="text-lg font-bold mb-4">
+                    🔄 Update Status
+                </h3>
+
+                <div class="flex gap-3">
+
+                    <select id="statusSelect"
+                            class="border rounded-lg px-4 py-2 flex-1">
+
+                        <option value="REPORTED">REPORTED</option>
+                        <option value="TRIAGED">TRIAGED</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="CODE_REVIEW">CODE_REVIEW</option>
+                        <option value="QA_VERIFICATION">QA_VERIFICATION</option>
+                        <option value="RESOLVED">RESOLVED</option>
+                        <option value="CLOSED">CLOSED</option>
+
+                    </select>
+
+                    <button onclick="updateStatus()"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-semibold">
+                        Update
+                    </button>
+
+                </div>
+
+                <p id="statusMessage"
+                   class="mt-3 text-sm">
+                </p>
+
+            </div>
+
+
+            <!-- Comments -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+
+                <h3 class="text-lg font-bold mb-4">
+                    💬 Comments
+                </h3>
+
+                <div id="commentsList"
+                     class="space-y-3 mb-5">
+                </div>
+
+                <textarea id="commentText"
+                          rows="3"
+                          placeholder="Write a comment..."
+                          class="w-full border rounded-lg px-4 py-3">
+                </textarea>
+
+                <button onclick="sendComment()"
+                        class="mt-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-semibold">
+                    Add Comment
+                </button>
+
+            </div>
+
+
+            <!-- Attachments -->
+            <div class="bg-white rounded-2xl shadow p-6 mt-6">
+
+                <h2 class="text-lg font-bold mb-4">
+                    📎 Attachments
+                </h2>
+
+                <input
+                    type="file"
+                    id="attachmentFile"
+                    class="border rounded-lg p-2 w-full mb-3"
+                >
+
+                <button
+                    onclick="uploadAttachment()"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+                    Upload Attachment
+                </button>
+
+                <p id="uploadMessage"
+                   class="mt-3 text-sm">
+                </p>
+
+            </div>
+
+
+            <!-- Activity -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 mt-6">
+
+                <h3 class="text-lg font-bold mb-4">
+                    📋 Activity Log
+                </h3>
+
+                <div id="activityList"
+                     class="space-y-3">
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Error -->
+        <div id="errorMessage"
+             class="hidden bg-white rounded-2xl p-8 text-center text-red-600">
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="sidebar.js"></script>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+const token =
+    localStorage.getItem("bugflow_token");
+
+const params =
+    new URLSearchParams(window.location.search);
+
+const issueId =
+    params.get("id");
+
+
+/* =========================
+   CHECK ISSUE ID
+========================= */
+
+
+/* =========================
+   LOAD TAGS
+========================= */
+
+async function loadTags() {
+
+    const container =
+        document.getElementById("tagsList");
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/${issueId}/tags`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            container.innerHTML = `
+                <p class="text-red-500 text-sm">
+                    Failed to load tags.
+                </p>
+            `;
+
+            return;
+        }
+
+        if (!data.tags || data.tags.length === 0) {
+
+            container.innerHTML = `
+                <p class="text-slate-500 text-sm">
+                    No tags added yet.
+                </p>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = data.tags.map(tag => `
+            <span
+                class="inline-flex items-center gap-2
+                       bg-indigo-100 text-indigo-700
+                       px-3 py-1.5 rounded-full
+                       text-sm font-semibold">
+
+                ${tag}
+
+            </span>
+        `).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load tags error:",
+            error
+        );
+
+        container.innerHTML = `
+            <p class="text-red-500 text-sm">
+                ${error.message}
+            </p>
+        `;
+    }
+}
+
+/* =========================
+   ADD TAG
+========================= */
+
+async function addTag() {
+
+    const input =
+        document.getElementById("tagName");
+
+    const message =
+        document.getElementById("tagMessage");
+
+    const tagName =
+        input.value.trim();
+
+    if (!tagName) {
+
+        message.textContent =
+            "Please enter a tag name.";
+
+        message.className =
+            "text-sm mb-3 text-red-600";
+
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/${issueId}/tags?name=${encodeURIComponent(tagName)}`,
+            {
+                method: "POST",
+                headers: authHeaders()
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            message.textContent =
+                data.detail ||
+                "Failed to add tag.";
+
+            message.className =
+                "text-sm mb-3 text-red-600";
+
+            return;
+        }
+
+        message.textContent =
+            "Tag added successfully! ✅";
+
+        message.className =
+            "text-sm mb-3 text-green-600";
+
+        input.value = "";
+
+        await loadTags();
+
+        await loadActivity();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Add tag error:",
+            error
+        );
+
+        message.textContent =
+            "Server error: " + error.message;
+
+        message.className =
+            "text-sm mb-3 text-red-600";
+    }
+}
+
+/* =========================
+   AUTH HEADERS
+========================= */
+
+function authHeaders() {
+
+    return {
+        "Authorization":
+            "Bearer " + token
+    };
+
+}
+
+
+/* =========================
+   LOAD ISSUE
+========================= */
+
+async function loadIssue() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/${issueId}`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Failed to load issue"
+            );
+
+        }
+
+        document
+            .getElementById("loading")
+            .classList.add("hidden");
+
+        document
+            .getElementById("issueContent")
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById("issueKey")
+            .textContent =
+            data.issue_key || "";
+
+
+        document
+            .getElementById("issueTitle")
+            .textContent =
+            data.title || "";
+
+
+        document
+            .getElementById("severity")
+            .textContent =
+            data.severity || "-";
+
+
+        document
+            .getElementById("priority")
+            .textContent =
+            data.priority || "-";
+
+
+        document
+            .getElementById("reporter")
+            .textContent =
+            data.reporter_id || "-";
+
+
+        document
+            .getElementById("assignee")
+            .textContent =
+            data.assignee_id ||
+            "Unassigned";
+
+
+        document
+            .getElementById("description")
+            .textContent =
+            data.description ||
+            "No description provided.";
+
+
+        document
+            .getElementById("reproduction")
+            .textContent =
+            data.reproduction_steps ||
+            "No reproduction steps provided.";
+
+
+        document
+            .getElementById("projectId")
+            .textContent =
+            data.project_id || "-";
+
+
+        document
+            .getElementById("sprintId")
+            .textContent =
+            data.sprint_id ||
+            "Not assigned";
+
+
+        document
+            .getElementById("statusBadge")
+            .textContent =
+            data.status || "-";
+
+
+        document
+            .getElementById("statusSelect")
+            .value =
+            data.status;
+
+
+        setStatusStyle(
+            data.status
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+   STATUS STYLE
+========================= */
+
+function setStatusStyle(status) {
+
+    const badge =
+        document.getElementById(
+            "statusBadge"
+        );
+
+    badge.className =
+        "px-4 py-2 rounded-full text-sm font-semibold";
+
+
+    if (status === "CLOSED") {
+
+        badge.classList.add(
+            "bg-green-100",
+            "text-green-700"
+        );
+
+    }
+
+    else if (status === "IN_PROGRESS") {
+
+        badge.classList.add(
+            "bg-blue-100",
+            "text-blue-700"
+        );
+
+    }
+
+    else if (status === "RESOLVED") {
+
+        badge.classList.add(
+            "bg-emerald-100",
+            "text-emerald-700"
+        );
+
+    }
+
+    else {
+
+        badge.classList.add(
+            "bg-yellow-100",
+            "text-yellow-700"
+        );
+
+    }
+
+}
+
+
+/* =========================
+   DEVELOPER MATCHING
+========================= */
+
+async function loadDeveloperMatches() {
+
+    const loading =
+        document.getElementById(
+            "developerLoading"
+        );
+
+    const container =
+        document.getElementById(
+            "developerMatches"
+        );
+
+
+    loading.classList.remove("hidden");
+
+    container.innerHTML = "";
+
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/${issueId}/developer-matches`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Failed to find developers"
+            );
+
+        }
+
+
+        loading.classList.add("hidden");
+
+
+        if (
+            !data.matches ||
+            data.matches.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="border rounded-xl p-4 bg-slate-50">
+                    <p class="text-sm text-slate-500">
+                        No suitable developers found.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            data.matches.map(
+                (developer, index) => `
+
+                <div class="border rounded-xl p-5 bg-slate-50">
+
+                    <div class="flex justify-between items-start">
+
+                        <div>
+
+                            <div class="flex items-center gap-3">
+
+                                <span class="bg-indigo-100 text-indigo-700
+                                             w-8 h-8 rounded-full
+                                             flex items-center justify-center
+                                             font-bold">
+                                    ${index + 1}
+                                </span>
+
+                                <div>
+
+                                    <h4 class="font-bold text-slate-900">
+                                        ${developer.developer_name || "Unknown Developer"}
+                                    </h4>
+
+                                    <p class="text-sm text-slate-500">
+                                        ${developer.team || "No team assigned"}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="text-right">
+
+                            <p class="text-2xl font-bold text-indigo-600">
+                                ${developer.matching_score}
+                            </p>
+
+                            <p class="text-xs text-slate-500">
+                                Matching Score
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+
+                        <div>
+
+                            <p class="text-xs text-slate-500">
+                                Core Skills
+                            </p>
+
+                            <p class="text-sm font-semibold mt-1">
+                                ${developer.core_skills || "Not provided"}
+                            </p>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-xs text-slate-500">
+                                Matched Skills
+                            </p>
+
+                            <p class="text-sm font-semibold mt-1">
+                                ${
+                                    developer.matched_skills &&
+                                    developer.matched_skills.length
+                                    ? developer.matched_skills.join(", ")
+                                    : "No matching skills"
+                                }
+                            </p>
+
+                        </div>
+
+
+                        <div>
+
+                            <p class="text-xs text-slate-500">
+                                Active Tasks
+                            </p>
+
+                            <p class="text-sm font-semibold mt-1">
+                                ${developer.active_tasks}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4">
+
+                        <p class="text-xs text-slate-500">
+                            Proficiency
+                        </p>
+
+                        <p class="text-sm font-semibold mt-1">
+                            ${developer.proficiency || "Not provided"}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Developer matching error:",
+            error
+        );
+
+        loading.classList.add("hidden");
+
+        container.innerHTML = `
+            <div class="border border-red-200 rounded-xl p-4 bg-red-50">
+                <p class="text-sm text-red-600">
+                    ${error.message}
+                </p>
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================
+   UPDATE STATUS
+========================= */
+
+async function updateStatus() {
+
+    const newStatus =
+        document.getElementById(
+            "statusSelect"
+        ).value;
+
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/${issueId}/status?status=${newStatus}`,
+            {
+                method: "PATCH",
+                headers: authHeaders()
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        const message =
+            document.getElementById(
+                "statusMessage"
+            );
+
+
+        if (!response.ok) {
+
+            message.textContent =
+                data.detail ||
+                "Status update failed.";
+
+            message.className =
+                "mt-3 text-sm text-red-600";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Status updated successfully!";
+
+        message.className =
+            "mt-3 text-sm text-green-600";
+
+
+        await loadIssue();
+
+        await loadActivity();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* =========================
+   LOAD COMMENTS
+========================= */
+
+async function loadComments() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/comments/${issueId}`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+
+        const comments =
+            await response.json();
+
+
+        const list =
+            document.getElementById(
+                "commentsList"
+            );
+
+
+        if (!response.ok) {
+
+            list.innerHTML = `
+                <p class="text-red-500 text-sm">
+                    Failed to load comments.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        if (!comments.length) {
+
+            list.innerHTML = `
+                <p class="text-slate-500 text-sm">
+                    No comments yet.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        list.innerHTML =
+            comments.map(
+                comment => `
+
+            <div class="border rounded-xl p-4 bg-slate-50">
+
+                <p class="text-slate-700">
+                    ${comment.comment || ""}
+                </p>
+
+                <p class="text-xs text-slate-500 mt-2">
+                    User ID: ${comment.user_id || "-"}
+                </p>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    ${comment.created_at || ""}
+                </p>
+
+            </div>
+
+        `
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load comments error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ADD COMMENT
+========================= */
+
+async function sendComment() {
+
+    const text =
+        document
+            .getElementById("commentText")
+            .value
+            .trim();
+
+
+    if (!text) {
+
+        alert(
+            "Please write a comment."
+        );
+
+        return;
+    }
+
+
+    const currentToken =
+        localStorage.getItem(
+            "bugflow_token"
+        );
+
+
+    const requestBody = {
+        comment: text
+    };
+
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/comments/${issueId}`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        currentToken,
+
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(
+                        requestBody
+                    )
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                "Error: " +
+                JSON.stringify(data)
+            );
+
+            return;
+        }
+
+
+        document
+            .getElementById("commentText")
+            .value = "";
+
+
+        alert(
+            "Comment added successfully!"
+        );
+
+
+        await loadComments();
+
+        await loadActivity();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "COMMENT ERROR:",
+            error
+        );
+
+        alert(
+            "Server error: " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================
+   UPLOAD ATTACHMENT
+========================= */
+
+async function uploadAttachment() {
+
+    const fileInput =
+        document.getElementById(
+            "attachmentFile"
+        );
+
+
+    const message =
+        document.getElementById(
+            "uploadMessage"
+        );
+
+
+    if (!fileInput.files.length) {
+
+        message.textContent =
+            "Please select a file.";
+
+        message.className =
+            "mt-3 text-sm text-red-600";
+
+        return;
+    }
+
+
+    const file =
+        fileInput.files[0];
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/attachments/${issueId}`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        localStorage.getItem(
+                            "bugflow_token"
+                        )
+                },
+
+                body: formData
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            message.textContent =
+                data.detail ||
+                "Upload failed.";
+
+            message.className =
+                "mt-3 text-sm text-red-600";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Attachment uploaded successfully! ✅";
+
+        message.className =
+            "mt-3 text-sm text-green-600";
+
+
+        fileInput.value = "";
+
+
+        await loadActivity();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Attachment upload error:",
+            error
+        );
+
+        message.textContent =
+            "Server error: " +
+            error.message;
+
+        message.className =
+            "mt-3 text-sm text-red-600";
+
+    }
+
+}
+
+
+/* =========================
+   LOAD ACTIVITY
+========================= */
+
+async function loadActivity() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/activity/${issueId}`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+
+        const activities =
+            await response.json();
+
+
+        const list =
+            document.getElementById(
+                "activityList"
+            );
+
+
+        if (!response.ok) {
+
+            list.innerHTML = `
+                <p class="text-red-500 text-sm">
+                    Failed to load activity.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        if (!activities.length) {
+
+            list.innerHTML = `
+                <p class="text-slate-500 text-sm">
+                    No activity yet.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        list.innerHTML =
+            activities.map(
+                activity => `
+
+                <div class="border-l-4 border-indigo-500 pl-4 py-2">
+
+                    <p class="font-semibold text-sm">
+                        ${activity.action}
+                    </p>
+
+                    <p class="text-xs text-slate-500">
+                        User ID: ${activity.user_id || "-"}
+                    </p>
+
+                    <p class="text-xs text-slate-400">
+                        ${activity.created_at || ""}
+                    </p>
+
+                </div>
+
+            `
+            ).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load activity error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   SHOW ERROR
+========================= */
+
+function showError(message) {
+
+    document
+        .getElementById("loading")
+        .classList.add("hidden");
+
+
+    const error =
+        document.getElementById(
+            "errorMessage"
+        );
+
+
+    error.classList.remove(
+        "hidden"
+    );
+
+
+    error.textContent =
+        message;
+
+}
+
+</script>
+
+</body>
+</html>

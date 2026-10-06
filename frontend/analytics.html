@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow - Analytics</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+            <div>
+                <h1 class="text-2xl font-bold text-indigo-600">
+                    BugFlow
+                </h1>
+                <p class="text-sm text-slate-500">
+                    Analytics & Quality Dashboard
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button
+                    onclick="exportPDF()"
+                    class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">
+                    Export PDF
+                </button>
+
+                <button
+                    onclick="exportCSV()"
+                    class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">
+                    Export CSV
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+
+    <!-- Main -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold">
+                Analytics Overview
+            </h2>
+
+            <p class="text-slate-500 mt-2">
+                Monitor defect trends, issue quality and workflow performance.
+            </p>
+        </div>
+
+
+        <!-- Loading -->
+        <div id="loading"
+             class="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <p class="text-slate-500">
+                Loading analytics...
+            </p>
+        </div>
+
+
+        <!-- Quality Metrics -->
+        <section
+            id="metricsSection"
+            class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+            <!-- Fix Rate -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <p class="text-sm text-slate-500">
+                    Fix Rate
+                </p>
+
+                <h3 id="fixRate"
+                    class="text-3xl font-bold text-green-600 mt-2">
+                    0%
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-2">
+                    Resolved + Closed issues
+                </p>
+            </div>
+
+
+            <!-- MTTR -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <p class="text-sm text-slate-500">
+                    MTTR
+                </p>
+
+                <h3 id="mttr"
+                    class="text-3xl font-bold text-blue-600 mt-2">
+                    0 hrs
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-2">
+                    Mean Time To Resolution
+                </p>
+            </div>
+
+
+            <!-- Leakage -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <p class="text-sm text-slate-500">
+                    Leakage
+                </p>
+
+                <h3 id="leakage"
+                    class="text-3xl font-bold text-orange-600 mt-2">
+                    0%
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-2">
+                    Production defects
+                </p>
+            </div>
+
+
+            <!-- Backlog Health -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <p class="text-sm text-slate-500">
+                    Backlog Health
+                </p>
+
+                <h3 id="backlogHealth"
+                    class="text-3xl font-bold text-indigo-600 mt-2">
+                    0
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-2">
+                    Overall backlog score
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- Charts -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Defect Trend -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+
+                <h3 class="text-lg font-bold mb-1">
+                    14-Day Defect Trend
+                </h3>
+
+                <p class="text-sm text-slate-500 mb-4">
+                    Number of defects reported each day.
+                </p>
+
+                <div id="defectTrend"
+                     class="w-full h-80">
+                </div>
+
+            </div>
+
+
+            <!-- Severity -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+
+                <h3 class="text-lg font-bold mb-1">
+                    Severity Distribution
+                </h3>
+
+                <p class="text-sm text-slate-500 mb-4">
+                    Distribution of issues by severity.
+                </p>
+
+                <div id="severityChart"
+                     class="w-full h-80">
+                </div>
+
+            </div>
+
+
+            <!-- Workflow Pipeline -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 lg:col-span-2">
+
+                <h3 class="text-lg font-bold mb-1">
+                    Workflow Pipeline
+                </h3>
+
+                <p class="text-sm text-slate-500 mb-4">
+                    Current issues across workflow stages.
+                </p>
+
+                <div id="workflowChart"
+                     class="w-full h-96">
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+console.log("TOKEN:", localStorage.getItem("token"));
+
+function authHeaders() {
+
+    const token = localStorage.getItem("bugflow_token");
+
+    return {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+    };
+}
+
+
+/* ==============================
+   LOAD QUALITY METRICS
+================================ */
+
+async function loadMetrics() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/analytics/quality-metrics`,
+            {
+                headers: authHeaders()
+                
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Failed to load metrics"
+            );
+        }
+
+
+        document.getElementById("fixRate").textContent =
+            `${data.fix_rate}%`;
+
+        document.getElementById("mttr").textContent =
+            `${data.mttr_hours} hrs`;
+
+        document.getElementById("leakage").textContent =
+            `${data.leakage}%`;
+
+        document.getElementById("backlogHealth").textContent =
+            data.backlog_health;
+
+
+        document.getElementById("loading")
+            .classList.add("hidden");
+
+        document.getElementById("metricsSection")
+            .classList.remove("hidden");
+
+    } catch (error) {
+
+        console.error(
+            "Metrics error:",
+            error
+        );
+
+        document.getElementById("loading").innerHTML = `
+            <p class="text-red-600">
+                Failed to load analytics metrics.
+            </p>
+        `;
+    }
+}
+
+
+/* ==============================
+   DEFECT TREND
+================================ */
+
+async function loadDefectTrend() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/analytics/defect-trends`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Failed to load defect trends"
+            );
+        }
+
+
+        const dates = data.dates || [];
+        const counts = data.counts || [];
+
+
+        Plotly.newPlot(
+            "defectTrend",
+            [
+                {
+                    x: dates,
+                    y: counts,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "Defects"
+                }
+            ],
+            {
+                margin: {
+                    t: 20,
+                    r: 20,
+                    b: 50,
+                    l: 50
+                },
+
+                xaxis: {
+                    title: "Date"
+                },
+
+                yaxis: {
+                    title: "Defects"
+                }
+            },
+
+            {
+                responsive: true
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Defect trend error:",
+            error
+        );
+
+    }
+}
+
+
+/* ==============================
+   SEVERITY CHART
+================================ */
+
+async function loadSeverityChart() {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/analytics/plotly-charts`,
+            {
+                headers: authHeaders()
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Failed to load charts"
+            );
+        }
+
+
+        const severity = data.severity || {};
+
+
+        Plotly.newPlot(
+            "severityChart",
+            [
+                {
+                    labels: Object.keys(severity),
+                    values: Object.values(severity),
+                    type: "pie",
+                    hole: 0.45
+                }
+            ],
+            {
+                margin: {
+                    t: 20,
+                    r: 20,
+                    b: 20,
+                    l: 20
+                }
+            },
+
+            {
+                responsive: true
+            }
+        );
+
+
+        const workflow =
+            data.workflow || {};
+
+
+        Plotly.newPlot(
+            "workflowChart",
+            [
+                {
+                    x: Object.keys(workflow),
+                    y: Object.values(workflow),
+                    type: "bar",
+                    name: "Issues"
+                }
+            ],
+            {
+                margin: {
+                    t: 20,
+                    r: 20,
+                    b: 80,
+                    l: 50
+                },
+
+                xaxis: {
+                    title: "Workflow Status"
+                },
+
+                yaxis: {
+                    title: "Number of Issues"
+                }
+            },
+
+            {
+                responsive: true
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Chart error:",
+            error
+        );
+
+    }
+}
+
+
+/* ==============================
+   EXPORT PDF
+================================ */
+
+async function exportPDF() {
+
+    const token = localStorage.getItem("bugflow_token");
+
+    const response = await fetch(
+        `${API_URL}/api/v1/export/pdf`,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json();
+        alert(data.detail || "PDF export failed");
+        return;
+    }
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "bugflow-report.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+}
+
+
+/* ==============================
+   EXPORT CSV
+================================ */
+
+async function exportCSV() {
+
+    const token = localStorage.getItem("bugflow_token");
+
+    const response = await fetch(
+        `${API_URL}/api/v1/export/csv`,
+        {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        const data = await response.json();
+        alert(data.detail || "CSV export failed");
+        return;
+    }
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "bugflow-report.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+}
+
+/* ==============================
+   INITIAL LOAD
+================================ */
+
+async function loadAnalytics() {
+
+    await loadMetrics();
+
+    await loadDefectTrend();
+
+    await loadSeverityChart();
+
+}
+
+
+loadAnalytics();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow - Overview</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+    <!-- MAIN LAYOUT -->
+    <div class="flex min-h-screen">
+
+        <div id="sidebar"></div>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="ml-64 flex-1">
+
+            <!-- TOP HEADER -->
+            <header class="bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between">
+
+                <div>
+
+                    <p class="text-sm text-slate-500">
+                        BugFlow
+                    </p>
+
+                    <h2 class="text-2xl font-bold text-slate-900">
+                        Overview
+                    </h2>
+
+                </div>
+
+
+                <div class="flex items-center gap-4">
+
+                    <span class="px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold">
+                        ADMIN
+                    </span>
+
+                    <a href="http://127.0.0.1:8000/docs"
+                       target="_blank"
+                       class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+
+                        API Docs →
+
+                    </a>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- CONTENT -->
+            <section class="p-8">
+
+
+                <!-- WELCOME -->
+                <div class="mb-8">
+
+                    <p class="text-sm font-semibold text-indigo-600 uppercase tracking-wide">
+                        Dashboard
+                    </p>
+
+                    <h1 class="text-3xl font-bold text-slate-900 mt-1">
+                        Welcome to BugFlow 👋
+                    </h1>
+
+                    <p class="text-slate-500 mt-2">
+                        Monitor issues, track progress and manage your development workflow.
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================= STATISTICS ================= -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+
+
+                    <!-- TOTAL -->
+                    <a href="issues.html"
+                       class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-slate-500">
+                                    Total Issues
+                                </p>
+
+                                <p id="totalIssues"
+                                   class="text-3xl font-bold text-slate-900 mt-2">
+                                    0
+                                </p>
+
+                            </div>
+
+                            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-xl">
+                                🐞
+                            </div>
+
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- REPORTED -->
+                    <a href="issues.html"
+                       class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-slate-500">
+                                    Reported
+                                </p>
+
+                                <p id="reportedIssues"
+                                   class="text-3xl font-bold text-slate-900 mt-2">
+                                    0
+                                </p>
+
+                            </div>
+
+                            <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center text-xl">
+                                📋
+                            </div>
+
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- IN PROGRESS -->
+                    <a href="issues.html"
+                       class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-slate-500">
+                                    In Progress
+                                </p>
+
+                                <p id="progressIssues"
+                                   class="text-3xl font-bold text-slate-900 mt-2">
+                                    0
+                                </p>
+
+                            </div>
+
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-xl">
+                                ⚙️
+                            </div>
+
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- CLOSED -->
+                    <a href="issues.html"
+                       class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition">
+
+                        <div class="flex items-center justify-between">
+
+                            <div>
+
+                                <p class="text-sm text-slate-500">
+                                    Closed
+                                </p>
+
+                                <p id="closedIssues"
+                                   class="text-3xl font-bold text-slate-900 mt-2">
+                                    0
+                                </p>
+
+                            </div>
+
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-xl">
+                                ✅
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- ================= TWO COLUMNS ================= -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+
+                    <!-- STATUS SUMMARY -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+
+                        <div class="px-6 py-5 border-b border-slate-200">
+
+                            <h2 class="text-lg font-bold text-slate-900">
+                                Status Summary
+                            </h2>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Current issue workflow status.
+                            </p>
+
+                        </div>
+
+
+                        <div class="p-6 space-y-4">
+
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-slate-600">
+                                    📋 Reported
+                                </span>
+
+                                <span id="summaryReported"
+                                      class="font-bold text-slate-900">
+                                    0
+                                </span>
+
+                            </div>
+
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-slate-600">
+                                    ⚙️ In Progress
+                                </span>
+
+                                <span id="summaryProgress"
+                                      class="font-bold text-slate-900">
+                                    0
+                                </span>
+
+                            </div>
+
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-slate-600">
+                                    🔍 QA / Review
+                                </span>
+
+                                <span id="summaryResolved"
+                                      class="font-bold text-slate-900">
+                                    0
+                                </span>
+
+                            </div>
+
+
+                            <div class="flex items-center justify-between">
+
+                                <span class="text-slate-600">
+                                    ✅ Closed
+                                </span>
+
+                                <span id="summaryClosed"
+                                      class="font-bold text-slate-900">
+                                    0
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- SPRINT -->
+                    <a href="sprints.html"
+                       class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition block">
+
+                        <div class="px-6 py-5 border-b border-slate-200">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+
+                                    <h2 class="text-lg font-bold text-slate-900">
+                                        Sprint
+                                    </h2>
+
+                                    <p class="text-sm text-slate-500 mt-1">
+                                        Current sprint information.
+                                    </p>
+
+                                </div>
+
+                                <span class="text-2xl">
+                                    🚀
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="p-6">
+
+                            <h3 id="sprintName"
+                                class="text-xl font-bold text-slate-900">
+                                Loading...
+                            </h3>
+
+                            <p id="sprintGoal"
+                               class="text-slate-500 mt-2">
+                                Loading sprint goal...
+                            </p>
+
+
+                            <div class="mt-5">
+
+                                <span id="sprintStatus"
+                                      class="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
+                                    PLANNED
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- ================= ACTIVE ISSUES ================= -->
+                <div class="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+                    <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+
+                        <div>
+
+                            <h2 class="text-lg font-bold text-slate-900">
+                                Active Issues
+                            </h2>
+
+                            <p class="text-sm text-slate-500 mt-1">
+                                Recently created BugFlow issues.
+                            </p>
+
+                        </div>
+
+
+                        <a href="issues.html"
+                           class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+
+                            View All →
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full">
+
+                            <thead class="bg-slate-50">
+
+                                <tr>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Key
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Title
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Severity
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Priority
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase">
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="dashboardIssues">
+
+                                <tr>
+
+                                    <td colspan="5"
+                                        class="text-center py-10 text-slate-400">
+
+                                        Loading issues...
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+
+        const API_URL = "http://127.0.0.1:8000";
+
+        const TOKEN = localStorage.getItem("bugflow_token");
+
+
+        // ================= LOAD ISSUES =================
+
+        async function loadDashboardIssues() {
+
+            try {
+
+                const response = await fetch(
+                    `${API_URL}/api/v1/issues/`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${TOKEN}`
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error("Failed to load issues");
+
+                }
+
+
+                const issues = await response.json();
+
+
+                updateDashboardStatistics(issues);
+
+                displayDashboardIssues(issues);
+
+                loadStatusSummary(issues);
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                document.getElementById("dashboardIssues").innerHTML = `
+
+                    <tr>
+
+                        <td colspan="5"
+                            class="text-center py-10 text-red-500">
+
+                            Failed to load issues.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+        }
+
+
+
+        // ================= STATISTICS =================
+
+        function updateDashboardStatistics(issues) {
+
+            document.getElementById("totalIssues").textContent =
+                issues.length;
+
+
+            document.getElementById("reportedIssues").textContent =
+                issues.filter(
+                    issue => issue.status === "REPORTED"
+                ).length;
+
+
+            document.getElementById("progressIssues").textContent =
+                issues.filter(
+                    issue => issue.status === "IN_PROGRESS"
+                ).length;
+
+
+            document.getElementById("closedIssues").textContent =
+                issues.filter(
+                    issue => issue.status === "CLOSED"
+                ).length;
+
+        }
+
+
+
+        // ================= STATUS SUMMARY =================
+
+        function loadStatusSummary(issues) {
+
+            document.getElementById("summaryReported").textContent =
+                issues.filter(
+                    issue => issue.status === "REPORTED"
+                ).length;
+
+
+            document.getElementById("summaryProgress").textContent =
+                issues.filter(
+                    issue => issue.status === "IN_PROGRESS"
+                ).length;
+
+
+            document.getElementById("summaryResolved").textContent =
+                issues.filter(
+                    issue =>
+                        issue.status === "CODE_REVIEW" ||
+                        issue.status === "QA_VERIFICATION" ||
+                        issue.status === "RESOLVED"
+                ).length;
+
+
+            document.getElementById("summaryClosed").textContent =
+                issues.filter(
+                    issue => issue.status === "CLOSED"
+                ).length;
+
+        }
+
+
+
+        // ================= DISPLAY ISSUES =================
+
+        function displayDashboardIssues(issues) {
+
+            const table =
+                document.getElementById("dashboardIssues");
+
+
+            if (!issues.length) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td colspan="5"
+                            class="text-center py-10 text-slate-400">
+
+                            No issues found.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            const recentIssues = issues.slice(0, 5);
+
+
+            table.innerHTML = recentIssues.map(issue => `
+
+                <tr class="border-t border-slate-100 hover:bg-slate-50">
+
+                    <td class="px-6 py-4">
+
+                        <a href="issue-details.html?id=${issue.id}"
+                           class="font-semibold text-indigo-600 hover:text-indigo-800">
+
+                            ${issue.issue_key || "-"}
+
+                        </a>
+
+                    </td>
+
+
+                    <td class="px-6 py-4 text-sm text-slate-700">
+
+                        ${issue.title || "-"}
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold">
+
+                            ${issue.severity || "-"}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
+
+                            ${issue.priority || "-"}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold">
+
+                            ${issue.status || "-"}
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `).join("");
+
+        }
+
+
+
+        // ================= SPRINT =================
+
+        async function loadSprint() {
+
+            try {
+
+                const response = await fetch(
+                    `${API_URL}/api/v1/sprints/?project_id=6`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${TOKEN}`
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error("Failed to load sprint");
+
+                }
+
+
+                const sprints = await response.json();
+
+
+                if (!sprints.length) {
+
+                    document.getElementById("sprintName").textContent =
+                        "No Sprint";
+
+                    document.getElementById("sprintGoal").textContent =
+                        "Create a sprint to get started.";
+
+                    return;
+
+                }
+
+
+                const sprint = sprints[0];
+
+
+                document.getElementById("sprintName").textContent =
+                    sprint.name;
+
+
+                document.getElementById("sprintGoal").textContent =
+                    sprint.goal || "No sprint goal";
+
+
+                document.getElementById("sprintStatus").textContent =
+                    sprint.status;
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                document.getElementById("sprintName").textContent =
+                    "Sprint unavailable";
+
+            }
+
+        }
+
+
+
+        // ================= START =================
+
+        loadDashboardIssues();
+
+        loadSprint();
+
+    </script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

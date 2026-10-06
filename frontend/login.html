@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow Login</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white w-full max-w-md p-8 rounded-xl shadow">
+
+        <h1 class="text-3xl font-bold text-gray-900">
+            BugFlow
+        </h1>
+
+        <p class="text-gray-500 mb-6">
+            Login to your account
+        </p>
+
+        <form id="loginForm">
+
+            <label class="block mb-2 font-medium">
+                Username
+            </label>
+
+            <input
+                id="username"
+                type="text"
+                required
+                class="w-full border rounded-lg px-4 py-2 mb-4"
+                placeholder="Enter username"
+            >
+
+            <label class="block mb-2 font-medium">
+                Password
+            </label>
+
+            <input
+                id="password"
+                type="password"
+                required
+                class="w-full border rounded-lg px-4 py-2 mb-5"
+                placeholder="Enter password"
+            >
+
+            <button
+                type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            >
+                Login
+            </button>
+
+        </form>
+
+        <p id="message" class="mt-4 text-center"></p>
+
+    </div>
+
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:8000";
+
+        document.getElementById("loginForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const username =
+                    document.getElementById("username").value;
+
+                const password =
+                    document.getElementById("password").value;
+
+                const message =
+                    document.getElementById("message");
+
+                try {
+
+                    const formData = new URLSearchParams();
+
+                    formData.append("username", username);
+                    formData.append("password", password);
+
+                    const response = await fetch(
+                        `${API_URL}/api/v1/auth/login`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                            },
+
+                            body: formData
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data.detail || "Login failed"
+                        );
+                    }
+
+                    localStorage.setItem(
+                        "bugflow_token",
+                        data.access_token
+                    );
+
+                    message.textContent =
+                        "Login successful!";
+
+                    message.className =
+                        "mt-4 text-center text-green-600";
+
+                    setTimeout(() => {
+                        window.location.href =
+                            "index.html";
+                    }, 500);
+
+                } catch (error) {
+
+                    message.textContent =
+                        error.message;
+
+                    message.className =
+                        "mt-4 text-center text-red-600";
+                }
+
+            });
+
+    </script>
+
+</body>
+</html>

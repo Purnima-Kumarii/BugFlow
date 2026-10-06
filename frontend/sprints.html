@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BugFlow - Sprints</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="ml-64 flex-1 p-8">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">🚀 Sprints</h1>
+                <p class="text-slate-500 mt-1">
+                    Manage sprints and plan your project issues
+                </p>
+            </div>
+
+            <button
+                onclick="createSprint()"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl font-semibold shadow">
+                + Create Sprint
+            </button>
+        </div>
+
+
+        <!-- Sprint Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <p class="text-sm text-slate-500">Total Sprints</p>
+                <h2 id="totalSprints" class="text-3xl font-bold mt-2">0</h2>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <p class="text-sm text-slate-500">Active Sprints</p>
+                <h2 id="activeSprints" class="text-3xl font-bold mt-2">0</h2>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <p class="text-sm text-slate-500">Backlog Issues</p>
+                <h2 id="backlogCount" class="text-3xl font-bold mt-2">0</h2>
+            </div>
+
+        </div>
+
+
+        <!-- Current Sprints -->
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-bold">Current Sprints</h2>
+
+                <span class="text-sm text-slate-500">
+                    Project: BugFlow Platform
+                </span>
+            </div>
+
+            <div id="sprintList" class="space-y-4">
+                <p class="text-slate-500">Loading sprints...</p>
+            </div>
+
+        </div>
+
+
+        <!-- Backlog -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+
+            <div class="flex justify-between items-center mb-5">
+                <div>
+                    <h2 class="text-xl font-bold">📋 Product Backlog</h2>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Issues that are not assigned to a sprint
+                    </p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-left">
+
+                    <thead>
+                        <tr class="border-b text-sm text-slate-500">
+                            <th class="py-3">Issue</th>
+                            <th class="py-3">Title</th>
+                            <th class="py-3">Severity</th>
+                            <th class="py-3">Priority</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="backlogTable">
+                        <tr>
+                            <td colspan="6" class="py-6 text-center text-slate-500">
+                                Loading backlog...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="sidebar.js"></script>
+
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+const PROJECT_ID = 6;
+
+
+// Load Sprints
+async function loadSprints() {
+
+    try {
+
+        const response = await fetch(
+    `${API_URL}/api/v1/sprints/?project_id=${PROJECT_ID}`,
+    {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("bugflow_token")
+        }
+    }
+);
+
+        if (!response.ok) {
+            throw new Error("Failed to load sprints");
+        }
+
+        const sprints = await response.json();
+
+        document.getElementById("totalSprints").textContent =
+            sprints.length;
+
+        const active = sprints.filter(
+            sprint => sprint.status === "ACTIVE"
+        ).length;
+
+        document.getElementById("activeSprints").textContent = active;
+
+
+        const sprintList = document.getElementById("sprintList");
+
+        if (sprints.length === 0) {
+
+            sprintList.innerHTML = `
+                <div class="text-center py-8 text-slate-500">
+                    No sprints created yet.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        sprintList.innerHTML = sprints.map(sprint => `
+
+            <div class="border rounded-xl p-5 hover:shadow-md transition">
+
+                <div class="flex justify-between items-start">
+
+                    <div>
+
+                        <h3 class="text-lg font-bold text-slate-900">
+                            🚀 ${sprint.name}
+                        </h3>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            ${sprint.goal || "No sprint goal provided"}
+                        </p>
+
+                    </div>
+
+
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                        ${sprint.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"}">
+
+                        ${sprint.status}
+
+                    </span>
+
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-6 text-sm text-slate-500">
+
+    <span>
+        Project ID: ${sprint.project_id}
+    </span>
+
+    <span>
+        Sprint ID: ${sprint.id}
+    </span>
+
+    <span>
+        Issues: ${sprint.total_issues || 0}
+    </span>
+
+    <span>
+        Completed: ${sprint.completed_issues || 0}
+    </span>
+
+</div>
+
+<!-- Progress -->
+<div class="mt-4">
+
+    <div class="flex justify-between text-xs mb-1">
+        <span class="text-slate-500">Progress</span>
+
+        <span class="font-semibold">
+            ${
+                sprint.total_issues
+                    ? Math.round(
+                        (sprint.completed_issues / sprint.total_issues) * 100
+                    )
+                    : 0
+            }%
+        </span>
+    </div>
+
+    <div class="w-full bg-slate-200 rounded-full h-2">
+
+        <div
+            class="bg-indigo-600 h-2 rounded-full"
+            style="width: ${
+                sprint.total_issues
+                    ? Math.round(
+                        (sprint.completed_issues / sprint.total_issues) * 100
+                    )
+                    : 0
+            }%">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Sprint Status -->
+<div class="mt-4 flex gap-2">
+
+    <button
+        onclick="updateSprintStatus(${sprint.id}, 'ACTIVE')"
+        class="px-3 py-2 rounded-lg bg-green-100 text-green-700 text-xs font-semibold">
+        Start Sprint
+    </button>
+
+    <button
+        onclick="updateSprintStatus(${sprint.id}, 'COMPLETED')"
+        class="px-3 py-2 rounded-lg bg-slate-200 text-slate-700 text-xs font-semibold">
+        Complete Sprint
+    </button>
+
+    <button
+        onclick="viewSprintIssues(${sprint.id})"
+        class="px-3 py-2 rounded-lg bg-indigo-100 text-indigo-700 text-xs font-semibold">
+        View Issues
+    </button>
+
+</div>
+                
+
+            </div>
+
+        `).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("sprintList").innerHTML = `
+            <p class="text-red-500">
+                Failed to load sprints.
+            </p>
+        `;
+
+    }
+
+}
+
+
+
+// Load Backlog
+async function loadBacklog() {
+
+    try {
+
+        const response = await fetch(
+    `${API_URL}/api/v1/sprints/backlog/${PROJECT_ID}`,
+    {
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("bugflow_token")
+        }
+    }
+);
+
+        if (!response.ok) {
+            throw new Error("Failed to load backlog");
+        }
+
+        const issues = await response.json();
+
+        document.getElementById("backlogCount").textContent =
+            issues.length;
+
+
+        const table = document.getElementById("backlogTable");
+
+
+        if (issues.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="py-8 text-center text-slate-500">
+                        🎉 No issues in backlog.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        table.innerHTML = issues.map(issue => `
+
+            <tr class="border-b hover:bg-slate-50">
+                
+                <td class="py-4">
+                    <span class="font-semibold text-indigo-600">
+                        ${issue.issue_key}
+                    </span>
+                </td>
+
+                <td class="py-4">
+                    ${issue.title}
+                </td>
+
+                <td class="py-4">
+
+                    <span class="px-2 py-1 rounded-lg bg-red-100 text-red-700 text-xs">
+                        ${issue.severity}
+                    </span>
+
+                </td>
+
+                <td class="py-4">
+
+                    <span class="px-2 py-1 rounded-lg bg-orange-100 text-orange-700 text-xs">
+                        ${issue.priority}
+                    </span>
+
+                </td>
+                <td class="py-4">
+    <span class="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs">
+        ${issue.status}
+    </span>
+</td>
+                <td class="py-4">
+
+                    <button
+                         onclick="assignIssue(${issue.id})"
+                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">
+                         Assign to Sprint
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("backlogTable").innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="py-6 text-center text-red-500">
+                    Failed to load backlog.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+
+// Create Sprint
+async function createSprint() {
+
+    const name = prompt("Enter sprint name:");
+
+    if (!name) {
+        return;
+    }
+
+    const goal = prompt("Enter sprint goal:");
+
+    if (!goal) {
+        return;
+    }
+
+    const startDate = prompt(
+        "Enter start date (YYYY-MM-DD):"
+    );
+
+    if (!startDate) {
+        return;
+    }
+
+    const endDate = prompt(
+        "Enter end date (YYYY-MM-DD):"
+    );
+
+    if (!endDate) {
+        return;
+    }
+
+    try {
+
+        const url =
+            `${API_URL}/api/v1/sprints/` +
+            `?name=${encodeURIComponent(name)}` +
+            `&project_id=${PROJECT_ID}` +
+            `&goal=${encodeURIComponent(goal)}` +
+            `&start_date=${encodeURIComponent(startDate)}` +
+            `&end_date=${encodeURIComponent(endDate)}`;
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization":
+                    "Bearer " +
+                    localStorage.getItem("bugflow_token")
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Failed to create sprint"
+            );
+
+            return;
+        }
+
+        alert("Sprint created successfully! 🚀");
+
+        loadSprints();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Server error. Please check FastAPI.");
+    }
+}
+
+async function assignIssue(issueId) {
+
+    try {
+
+        const sprintResponse = await fetch(
+            `${API_URL}/api/v1/sprints/?project_id=${PROJECT_ID}`,
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        localStorage.getItem("bugflow_token")
+                }
+            }
+        );
+
+        const sprints = await sprintResponse.json();
+
+        if (!sprints.length) {
+            alert("No sprint available.");
+            return;
+        }
+
+        const sprintId = prompt(
+            "Enter Sprint ID:\n\n" +
+            sprints.map(
+                sprint => `${sprint.id} - ${sprint.name}`
+            ).join("\n")
+        );
+
+        if (!sprintId) {
+            return;
+        }
+
+        const response = await fetch(
+            `${API_URL}/api/v1/sprints/${sprintId}/issues/${issueId}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        localStorage.getItem("bugflow_token")
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(data.detail || "Failed to assign issue.");
+            return;
+        }
+
+        alert("Issue assigned to sprint successfully! 🚀");
+
+        loadBacklog();
+        loadSprints();
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Server error.");
+
+    }
+}
+// Update Sprint Status
+async function updateSprintStatus(sprintId, newStatus) {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/sprints/${sprintId}/status?status=${newStatus}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        localStorage.getItem("bugflow_token")
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Failed to update sprint status."
+            );
+
+            return;
+        }
+
+        alert(
+            `Sprint status changed to ${newStatus}!`
+        );
+
+        loadSprints();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Server error.");
+    }
+}
+
+
+// View Sprint Issues
+async function viewSprintIssues(sprintId) {
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/sprints/${sprintId}/issues`,
+            {
+                headers: {
+                    "Authorization":
+                        "Bearer " +
+                        localStorage.getItem("bugflow_token")
+                }
+            }
+        );
+
+        const issues = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                issues.detail ||
+                "Failed to load sprint issues."
+            );
+
+            return;
+        }
+
+        if (!issues.length) {
+
+            alert("No issues assigned to this sprint.");
+
+            return;
+        }
+
+        const message = issues
+            .map(
+                issue =>
+                    `${issue.issue_key} - ${issue.title} (${issue.status})`
+            )
+            .join("\n");
+
+        alert(
+            "Sprint Issues:\n\n" + message
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Server error.");
+    }
+}
+
+// Load everything
+loadSprints();
+loadBacklog();
+
+</script>
+
+</body>
+</html>

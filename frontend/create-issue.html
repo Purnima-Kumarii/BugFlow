@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow - Create Issue</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+    <div class="flex min-h-screen">
+
+        <!-- SIDEBAR -->
+        <div id="sidebar"></div>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="ml-64 flex-1">
+
+            <!-- HEADER -->
+            <header class="bg-white border-b border-slate-200 px-8 py-5">
+
+                <p class="text-sm text-slate-500">
+                    BugFlow
+                </p>
+
+                <h2 class="text-2xl font-bold text-slate-900">
+                    Create Issue
+                </h2>
+
+            </header>
+
+
+            <!-- CONTENT -->
+            <section class="p-8">
+
+                <div class="mb-7">
+
+                    <p class="text-sm font-semibold text-indigo-600 uppercase">
+                        Issue Management
+                    </p>
+
+                    <h1 class="text-3xl font-bold text-slate-900 mt-1">
+                        ➕ Create New Issue
+                    </h1>
+
+                    <p class="text-slate-500 mt-2">
+                        Report a new bug or issue in the BugFlow project.
+                    </p>
+
+                </div>
+
+
+                <!-- FORM -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-7 max-w-4xl">
+
+                    <form id="createIssueForm" class="space-y-6">
+
+
+                        <!-- TITLE -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Issue Title *
+                            </label>
+
+                            <input
+                                id="title"
+                                type="text"
+                                required
+                                placeholder="Enter issue title"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            >
+
+                        </div>
+
+                        <!-- DUPLICATE WARNING -->
+<div id="duplicateWarning"
+     class="hidden mt-3 p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+</div> 
+
+                        <!-- DESCRIPTION -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Description *
+                            </label>
+
+                            <textarea
+                                id="description"
+                                required
+                                rows="4"
+                                placeholder="Describe the issue..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            ></textarea>
+
+                        </div>
+                        
+
+                        <!-- REPRODUCTION STEPS -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Reproduction Steps
+                            </label>
+
+                            <textarea
+                                id="reproduction_steps"
+                                rows="4"
+                                placeholder="1. Open application&#10;2. Click...&#10;3. Observe..."
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- TWO COLUMNS -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+
+                            <!-- SEVERITY -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Severity *
+                                </label>
+
+                                <select
+                                    id="severity"
+                                    required
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                                    <option value="TRIVIAL">TRIVIAL</option>
+                                    <option value="MINOR">MINOR</option>
+                                    <option value="MAJOR" selected>MAJOR</option>
+                                    <option value="CRITICAL">CRITICAL</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- PRIORITY -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Priority *
+                                </label>
+
+                                <select
+                                    id="priority"
+                                    required
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                                    <option value="LOW">LOW</option>
+                                    <option value="MEDIUM" selected>MEDIUM</option>
+                                    <option value="HIGH">HIGH</option>
+                                    <option value="URGENT">URGENT</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- CATEGORY -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Category ID
+                                </label>
+
+                                <input
+                                    id="category_id"
+                                    type="number"
+                                    value="1"
+                                    placeholder="Example: 1"
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                            </div>
+
+
+                            <!-- PROJECT -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Project ID
+                                </label>
+
+                                <input
+                                    id="project_id"
+                                    type="number"
+                                    value="6"
+                                    required
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                            </div>
+
+
+                            <!-- ISSUE TYPE -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Issue Type
+                                </label>
+
+                                <select
+                                    id="issue_type"
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                                    <option value="BUG" selected>BUG</option>
+                                    <option value="FEATURE">FEATURE</option>
+                                    <option value="ENHANCEMENT">ENHANCEMENT</option>
+                                    <option value="SUPPORT">SUPPORT</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- ASSIGNEE -->
+                            <div>
+
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Developer ID
+                                </label>
+
+                                <input
+                                    id="assignee_id"
+                                    type="number"
+                                    placeholder="Optional"
+                                    class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- AFFECTED MODULE -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Affected Modules
+                            </label>
+
+                            <input
+                                id="affected_modules"
+                                type="text"
+                                placeholder="Example: Login, Dashboard, Database"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            >
+
+                        </div>
+
+
+                        <!-- ENVIRONMENT -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Environment Details
+                            </label>
+
+                            <input
+                                id="environment_details"
+                                type="text"
+                                placeholder="Example: Windows 11, Chrome"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            >
+
+                        </div>
+
+
+                        <!-- ESTIMATED EFFORT -->
+                        <div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                Estimated Effort
+                            </label>
+
+                            <input
+                                id="estimated_effort"
+                                type="number"
+                                step="0.5"
+                                placeholder="Example: 4"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                            >
+
+                        </div>
+
+
+                        <!-- BUTTON -->
+                        <div class="flex items-center gap-4 pt-3">
+
+                            <button
+                                type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+                            >
+                                ➕ Create Issue
+                            </button>
+
+
+                            <button
+                                type="reset"
+                                class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-semibold"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+
+
+                    </form>
+
+
+                    <!-- MESSAGE -->
+                    <div
+                        id="message"
+                        class="hidden mt-6 p-4 rounded-xl text-sm font-medium"
+                    ></div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- SIDEBAR SCRIPT -->
+    <script src="sidebar.js"></script>
+
+
+    <!-- CREATE ISSUE SCRIPT -->
+    <script>
+
+        const API_URL = "http://127.0.0.1:8000";
+
+        const TOKEN = localStorage.getItem("bugflow_token");
+    let duplicateTimer;
+
+async function checkDuplicates() {
+
+    const title = document.getElementById("title").value.trim();
+
+    const projectId = Number(
+        document.getElementById("project_id").value
+    );
+
+    const warning = document.getElementById("duplicateWarning");
+
+    if (title.length < 3) {
+        warning.classList.add("hidden");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/api/v1/issues/check-duplicates?title=${encodeURIComponent(title)}&project_id=${projectId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${TOKEN}`
+                }
+            }
+        );
+
+        const result = await response.json();
+
+        console.log(
+            "DUPLICATE STATUS:",
+            response.status
+        );
+
+        console.log(
+            "DUPLICATE RESPONSE:",
+            JSON.stringify(result, null, 2)
+        );
+
+        if (!response.ok) {
+            warning.classList.add("hidden");
+            return;
+        }
+
+        if (
+            result.is_duplicate &&
+            result.duplicates &&
+            result.duplicates.length > 0
+        ) {
+
+            warning.classList.remove("hidden");
+
+            const duplicateList =
+                result.duplicates.map(item => `
+                    <div class="mt-2">
+                        ⚠️ <strong>${item.issue_key}</strong>
+                        - ${item.title}
+                        <span class="text-xs">
+                            (${item.similarity}% similar)
+                        </span>
+                    </div>
+                `).join("");
+
+            warning.innerHTML = `
+                <div class="font-semibold">
+                    ⚠️ Possible Duplicate Issue
+                </div>
+
+                ${duplicateList}
+            `;
+
+        } else {
+
+            warning.classList.add("hidden");
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Duplicate check error:",
+            error
+        );
+
+        warning.classList.add("hidden");
+    }
+}
+        document
+    .getElementById("title")
+    .addEventListener("input", function () {
+
+        clearTimeout(duplicateTimer);
+
+        duplicateTimer = setTimeout(
+            checkDuplicates,
+            500
+        );
+
+    });
+        document
+            .getElementById("createIssueForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+
+                const message =
+                    document.getElementById("message");
+
+
+                message.className =
+                    "mt-6 p-4 rounded-xl text-sm font-medium bg-blue-50 text-blue-700";
+
+                message.textContent =
+                    "Creating issue...";
+
+
+                const data = {
+
+                    title:
+                        document.getElementById("title").value,
+
+                    description:
+                        document.getElementById("description").value,
+
+                    reproduction_steps:
+                        document.getElementById("reproduction_steps").value,
+
+                    severity:
+                        document.getElementById("severity").value,
+
+                    priority:
+                        document.getElementById("priority").value,
+
+                    category_id:
+                        Number(document.getElementById("category_id").value),
+
+                    project_id:
+                        Number(document.getElementById("project_id").value),
+
+                    issue_type:
+                        document.getElementById("issue_type").value,
+
+                    affected_modules:
+                        document.getElementById("affected_modules").value,
+
+                    environment_details:
+                        document.getElementById("environment_details").value,
+
+                    estimated_effort:
+                        document.getElementById("estimated_effort").value
+                            ? Number(document.getElementById("estimated_effort").value)
+                            : null
+
+                };
+
+
+                const assignee =
+                    document.getElementById("assignee_id").value;
+
+
+                if (assignee) {
+
+                    data.assignee_id =
+                        Number(assignee);
+
+                }
+
+
+                try {
+
+                    const response = await fetch(
+                        `${API_URL}/api/v1/issues/`,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${TOKEN}`
+                            },
+
+                            body: JSON.stringify(data)
+                        }
+                    );
+
+
+                    const result =
+                        await response.json();
+
+                    if (!response.ok) {
+
+    let errorMessage = "Failed to create issue";
+
+    if (Array.isArray(result.detail)) {
+
+        errorMessage = result.detail
+            .map(error => error.msg)
+            .join(", ");
+
+    } else if (typeof result.detail === "string") {
+
+        errorMessage = result.detail;
+
+    }
+
+    throw new Error(errorMessage);
+}
+                    
+
+
+                    message.className =
+                        "mt-6 p-4 rounded-xl text-sm font-medium bg-green-50 text-green-700";
+
+                    message.textContent =
+                        `✅ Issue created successfully: ${result.issue_key || "New Issue"}`;
+
+
+                    document
+                        .getElementById("createIssueForm")
+                        .reset();
+
+                }
+
+                catch (error) {
+
+                    console.error(error);
+
+                    message.className =
+                        "mt-6 p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700";
+
+                    message.textContent =
+                        `❌ ${error.message}`;
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>

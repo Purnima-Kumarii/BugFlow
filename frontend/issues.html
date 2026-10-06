@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BugFlow - Issues</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+
+    <div class="flex min-h-screen">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-950 text-white fixed left-0 top-0 bottom-0">
+
+            <div class="px-6 py-6 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+
+                    <div class="w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center text-xl">
+                        🐞
+                    </div>
+
+                    <div>
+                        <h1 class="text-xl font-bold">BugFlow</h1>
+                        <p class="text-xs text-slate-400">
+                            Issue Tracking Platform
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- MENU -->
+            <nav class="px-4 py-6 space-y-2">
+
+                <a href="index.html"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
+                    📊
+                    <span>Overview</span>
+                </a>
+
+
+                <a href="issues.html"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-600">
+                    🐞
+                    <span>Issues</span>
+                </a>
+
+
+                <a href="create-issue.html"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
+                    ➕
+                    <span>Create Issue</span>
+                </a>
+
+
+                <a href="sprints.html"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800">
+                    🚀
+                    <span>Sprints</span>
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+
+        <!-- MAIN CONTENT -->
+        <main class="ml-64 flex-1">
+
+            <!-- HEADER -->
+            <header class="bg-white border-b border-slate-200 px-8 py-5">
+
+                <p class="text-sm text-slate-500">
+                    BugFlow
+                </p>
+
+                <h2 class="text-2xl font-bold text-slate-900">
+                    Issues
+                </h2>
+
+            </header>
+
+
+            <!-- CONTENT -->
+            <section class="p-8">
+
+                <div class="mb-7">
+
+                    <p class="text-sm font-semibold text-indigo-600 uppercase">
+                        Issue Management
+                    </p>
+
+                    <h1 class="text-3xl font-bold text-slate-900 mt-1">
+                        🐞 All Issues
+                    </h1>
+
+                    <p class="text-slate-500 mt-2">
+                        View and manage all reported issues.
+                    </p>
+
+                </div>
+
+
+                <!-- SEARCH -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
+
+                    <input
+                        id="issueSearch"
+                        type="text"
+                        placeholder="🔍 Search issues..."
+                        class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-200"
+                    >
+
+                </div>
+
+
+                <!-- ISSUE TABLE -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full">
+
+                            <thead class="bg-slate-50 border-b border-slate-200">
+
+                                <tr>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        KEY
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        TITLE
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        SEVERITY
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        PRIORITY
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        STATUS
+                                    </th>
+
+                                    <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500">
+                                        ACTION
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="issuesTable">
+
+                                <tr>
+
+                                    <td colspan="6"
+                                        class="text-center py-10 text-slate-400">
+
+                                        Loading issues...
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        const API_URL = "http://127.0.0.1:8000";
+
+        const TOKEN = localStorage.getItem("bugflow_token");
+
+
+        async function loadIssues() {
+
+            try {
+
+                const response = await fetch(
+                    `${API_URL}/api/v1/issues/`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${TOKEN}`
+                        }
+                    }
+                );
+
+
+                if (!response.ok) {
+                    throw new Error("Failed to load issues");
+                }
+
+
+                const issues = await response.json();
+
+                displayIssues(issues);
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                document.getElementById("issuesTable").innerHTML = `
+
+                    <tr>
+
+                        <td colspan="6"
+                            class="text-center py-10 text-red-500">
+
+                            Failed to load issues.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+        }
+
+
+
+        function displayIssues(issues) {
+
+            const table =
+                document.getElementById("issuesTable");
+
+
+            if (!issues.length) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td colspan="6"
+                            class="text-center py-10 text-slate-400">
+
+                            No issues found.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            table.innerHTML = issues.map(issue => `
+
+                <tr class="border-t border-slate-100 hover:bg-slate-50">
+
+                    <td class="px-6 py-4">
+
+                        <span class="font-semibold text-indigo-600">
+                            ${issue.issue_key || "-"}
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+                        ${issue.title || "-"}
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold">
+                            ${issue.severity || "-"}
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
+                            ${issue.priority || "-"}
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold">
+                            ${issue.status || "-"}
+                        </span>
+
+                    </td>
+
+
+                    <td class="px-6 py-4">
+
+                        <a
+                            href="issue-details.html?id=${issue.id}"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm">
+
+                            View
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            `).join("");
+
+        }
+
+
+
+        // SEARCH
+        document.getElementById("issueSearch")
+            .addEventListener("input", function () {
+
+                const search =
+                    this.value.toLowerCase();
+
+                const rows =
+                    document.querySelectorAll("#issuesTable tr");
+
+
+                rows.forEach(row => {
+
+                    row.style.display =
+                        row.textContent
+                            .toLowerCase()
+                            .includes(search)
+                            ? ""
+                            : "none";
+
+                });
+
+            });
+
+
+
+        // LOAD
+        loadIssues();
+
+    </script>
+
+</body>
+</html>
